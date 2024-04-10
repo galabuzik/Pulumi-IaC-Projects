@@ -1,0 +1,7 @@
+name: azure-app-service-webapps
+runtime: dotnet
+description: Azure App Service WebApps
+config:
+  pulumi:tags:
+    value:
+      pulumi:template: azure-csharp
