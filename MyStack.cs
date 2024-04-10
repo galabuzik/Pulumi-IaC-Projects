@@ -2,6 +2,7 @@
 using Pulumi.AzureNative.Resources;
 using Pulumi.AzureNative.Web;
 using Pulumi.AzureNative.Web.Inputs;
+using System.Collections.Generic;
 
 class MyStack : Stack
 {
@@ -13,7 +14,7 @@ class MyStack : Stack
             ResourceGroupName = "pulumi-rg-01"
         });
 
-        // Create an Azure App Service Plan 
+        // Create an Azure App Service Plan
         var appServicePlan = new AppServicePlan("appServicePlan", new AppServicePlanArgs
         {
             ResourceGroupName = resourceGroup.Name,
@@ -28,29 +29,34 @@ class MyStack : Stack
             Kind = "App",
         });
 
-        // Create an Azure App Service
-        var appService = new WebApp("webApp", new WebAppArgs
-        {
-            ResourceGroupName = resourceGroup.Name,
-            ServerFarmId = appServicePlan.Id,
-            SiteConfig = new SiteConfigArgs
-            {
-                AppSettings = new[]
-                {
-                    new NameValuePairArgs
-                    {
-                        Name = "WEBSITE_RUN_FROM_PACKAGE",
-                        Value = "1"
-                    }
-                },
-                NetFrameworkVersion = "v6.0" // Specify .NET 6 runtime
-            }
-        });
+        // List to hold the WebApp endpoints
+        var endpoints = new List<Output<string>>();
 
-        // Output the App Service URL
-        this.Endpoint = Output.Format($"https://{appService.DefaultHostName}/");
+        // Loop to create 4 WebApps
+        for (int i = 1; i <= 4; i++)
+        {
+            var webApp = new WebApp($"cln-pulumi-0{i}", new WebAppArgs
+            {
+                ResourceGroupName = resourceGroup.Name,
+                ServerFarmId = appServicePlan.Id,
+                SiteConfig = new SiteConfigArgs
+                {
+                    AppSettings = new[]
+                    {
+                        new NameValuePairArgs
+                        {
+                            Name = "WEBSITE_RUN_FROM_PACKAGE",
+                            Value = "1"
+                        }
+                    },
+                    NetFrameworkVersion = "v6.0" // Specify .NET 6 runtime
+                }
+            });
+
+            // Add the WebApp endpoint to the list
+            endpoints.Add(webApp.DefaultHostName.Apply(hostname => $"https://{hostname}/"));
+        }
+
     }
 
-    [Output]
-    public Output<string> Endpoint { get; set; }
 }
