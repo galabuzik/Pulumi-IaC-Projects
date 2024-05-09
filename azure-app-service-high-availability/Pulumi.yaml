@@ -1,0 +1,7 @@
+name: azure-app-service-high-availability
+runtime: dotnet
+description: Azure App Service + Azure + Azure Cache for Redis deployed in a HA Setup
+config:
+  pulumi:tags:
+    value:
+      pulumi:template: ""
