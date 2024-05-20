@@ -10,7 +10,7 @@ class MyStack : Stack
         // Create an Azure Resource Group
         var resourceGroup = new ResourceGroup("resourceGroup", new ResourceGroupArgs
         {
-            ResourceGroupName = "pulumi-rg-01"
+            ResourceGroupName = "pulumi-rg-02"
         });
 
         // Create an Azure App Service Plan 

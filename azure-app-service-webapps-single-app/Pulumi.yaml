@@ -1,4 +1,4 @@
-name: azure-app-service-webapps
+name: azure-app-service-webapps-single-app
 runtime: dotnet
 description: Azure App Service WebApps
 config:
