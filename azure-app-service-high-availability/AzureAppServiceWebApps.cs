@@ -1,19 +1,29 @@
 ﻿using Pulumi;
 using Pulumi.AzureNative.Resources;
+using Pulumi.AzureNative.ServiceFabricMesh;
 using Pulumi.AzureNative.Web;
 using Pulumi.AzureNative.Web.Inputs;
+using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 
-class MyStack : Stack
+public class AzureWebApps
 {
-    public MyStack()
+    public Output<string> WebAppEndpointEastUs { get; set; }
+    public Output<string> WebAppEndpointUkSouth { get; set; }
+    public Output<string> ResourceGroupNameEastUS { get; set; }
+    public Output<string> AppServicePlanIdEastUS { get; set; }
+    public Output<string> ResourceGroupEastUSLocation { get; set; }
+    public AzureWebApps()
     {
         var resourceGroupEastUS = new ResourceGroup("pulumi-rg-eastus", new ResourceGroupArgs
         {
             ResourceGroupName = "pulumi-rg-eastus",
             Location = "East US"
         });
+
+        var resourceGroupNameEastUSName = resourceGroupEastUS.Name;
+        var resourceGroupEastUSLocation = resourceGroupEastUS.Location;
 
         var resourceGroupUKSouth = new ResourceGroup("pulumi-rg-uksouth", new ResourceGroupArgs
         {
@@ -37,6 +47,8 @@ class MyStack : Stack
             ZoneRedundant = true
         });
 
+        var appServicePlanEastUSId = appServicePlanEastUS.Id;
+
         var appServicePlanUKSouth = new AppServicePlan("cln-asp-uksouth", new AppServicePlanArgs
         {
             Name =  "cln-asp-uksouth",
@@ -56,7 +68,7 @@ class MyStack : Stack
 
         var webAppEastUS = new WebApp("cln-webapp-eastus", new WebAppArgs
         {
-            Name = "cln-webapp-east",
+            Name = "cln-webapp-eastus",
             ResourceGroupName = resourceGroupEastUS.Name,
             Location = resourceGroupEastUS.Location,
             ServerFarmId = appServicePlanEastUS.Id,
@@ -81,11 +93,10 @@ class MyStack : Stack
         // Outputs
         WebAppEndpointEastUs = webAppEastUS.DefaultHostName.Apply(hostName => $"https://{hostName}");
         WebAppEndpointUkSouth = webAppUKSouth.DefaultHostName.Apply(hostName => $"https://{hostName}");
+        ResourceGroupNameEastUS = resourceGroupEastUS.Name;
+        AppServicePlanIdEastUS = appServicePlanEastUS.Id;
+        ResourceGroupEastUSLocation = resourceGroupEastUS.Location;
+
     }
 
-    [Output]
-    public Output<string> WebAppEndpointEastUs { get; set; }
-
-    [Output]
-    public Output<string> WebAppEndpointUkSouth { get; set; }
 }
